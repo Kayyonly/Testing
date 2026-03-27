@@ -1,4 +1,5 @@
 import { getYTMusicClient } from "@/lib/ytmusic";
+import { getYTMusicClient } from "../lib/ytmusic";
 
 async function testYtMusicAri() {
   const ytmusic = await getYTMusicClient();

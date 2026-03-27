@@ -1,4 +1,8 @@
+<<<<<<< codex/generate-next.js-project-folder-structure-kgoced
 import { getYTMusicClient } from "@/lib/ytmusic";
+=======
+import { getYTMusicClient } from "../lib/ytmusic";
+>>>>>>> main
 
 async function testPlaylistType() {
   const ytmusic = await getYTMusicClient();
