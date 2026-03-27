@@ -1,0 +1,5 @@
+{
+  "name": "apple-music-clone-next14",
+  "description": "Apple Music clone style app built with Next.js 14 App Router, TypeScript, Tailwind CSS, and ytmusic-api.",
+  "version": "1.0.0"
+}

@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import type { Artist, Playlist, Track } from '../types/music';
+import type { Artist, Playlist, Track } from '@/types/music';
 
 type UserLibrary = {
   savedSongs: Track[];
@@ -29,7 +29,7 @@ const initialLibrary: UserLibrary = {
   followedArtists: [],
 };
 
-export const useStore = create<MusicState>()(
+export const useMusicStore = create<MusicState>()(
   persist(
     (set, get) => ({
       currentTrack: null,
@@ -56,17 +56,13 @@ export const useStore = create<MusicState>()(
             return { queue: [track, ...state.queue] };
           }
 
-          const currentIndex = state.queue.findIndex(
-            (item) => item.id === state.currentTrack?.id,
-          );
-
+          const currentIndex = state.queue.findIndex((item) => item.id === state.currentTrack?.id);
           if (currentIndex === -1) {
             return { queue: [state.currentTrack, track, ...state.queue] };
           }
 
           const nextQueue = [...state.queue];
           nextQueue.splice(currentIndex + 1, 0, track);
-
           return { queue: nextQueue };
         });
       },
@@ -79,20 +75,13 @@ export const useStore = create<MusicState>()(
             ...state.userLibrary,
             savedSongs: trackExists
               ? state.userLibrary.savedSongs.filter((item) => item.id !== track.id)
-              : [
-                  {
-                    ...track,
-                    dateAdded: track.dateAdded ?? new Date().toISOString(),
-                  },
-                  ...state.userLibrary.savedSongs,
-                ],
+              : [{ ...track, dateAdded: track.dateAdded ?? new Date().toISOString() }, ...state.userLibrary.savedSongs],
           },
         }));
 
         return trackExists ? 'unliked' : 'liked';
       },
-      isTrackSaved: (trackId) =>
-        get().userLibrary.savedSongs.some((track) => track.id === trackId),
+      isTrackSaved: (trackId) => get().userLibrary.savedSongs.some((track) => track.id === trackId),
     }),
     {
       name: 'apple-music-store',
