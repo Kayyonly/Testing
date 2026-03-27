@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getYTMusicClient } from '../../../lib/ytmusic';
+import { getYTMusicClient } from '@/lib/ytmusic';
 
 export async function GET(request: NextRequest) {
   const q = request.nextUrl.searchParams.get('q')?.trim();
