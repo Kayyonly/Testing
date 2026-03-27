@@ -16,9 +16,13 @@ type MusicState = {
   queue: Track[];
   userLibrary: UserLibrary;
   playTrack: (track: Track) => void;
+  playTracks: (tracks: Track[], startTrack?: Track) => void;
   togglePlay: () => void;
+  setIsPlaying: (value: boolean) => void;
   addToQueue: (track: Track) => void;
   playNext: (track: Track) => void;
+  nextTrack: () => void;
+  prevTrack: () => void;
   toggleLibrary: (track: Track) => 'liked' | 'unliked';
   isTrackSaved: (trackId: string) => boolean;
 };
@@ -39,14 +43,24 @@ export const useMusicStore = create<MusicState>()(
       playTrack: (track) => {
         set((state) => {
           const existsInQueue = state.queue.some((item) => item.id === track.id);
+          const nextQueue = existsInQueue ? state.queue : [track, ...state.queue];
           return {
             currentTrack: track,
             isPlaying: true,
-            queue: existsInQueue ? state.queue : [track, ...state.queue],
+            queue: nextQueue,
           };
         });
       },
+      playTracks: (tracks, startTrack) => {
+        if (!tracks.length) return;
+        set({
+          queue: tracks,
+          currentTrack: startTrack || tracks[0],
+          isPlaying: true,
+        });
+      },
       togglePlay: () => set((state) => ({ isPlaying: !state.isPlaying })),
+      setIsPlaying: (value) => set({ isPlaying: value }),
       addToQueue: (track) => {
         set((state) => ({ queue: [...state.queue, track] }));
       },
@@ -64,6 +78,22 @@ export const useMusicStore = create<MusicState>()(
           const nextQueue = [...state.queue];
           nextQueue.splice(currentIndex + 1, 0, track);
           return { queue: nextQueue };
+        });
+      },
+      nextTrack: () => {
+        set((state) => {
+          if (!state.currentTrack || !state.queue.length) return state;
+          const currentIndex = state.queue.findIndex((item) => item.id === state.currentTrack?.id);
+          const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % state.queue.length;
+          return { currentTrack: state.queue[nextIndex], isPlaying: true };
+        });
+      },
+      prevTrack: () => {
+        set((state) => {
+          if (!state.currentTrack || !state.queue.length) return state;
+          const currentIndex = state.queue.findIndex((item) => item.id === state.currentTrack?.id);
+          const prevIndex = currentIndex <= 0 ? state.queue.length - 1 : currentIndex - 1;
+          return { currentTrack: state.queue[prevIndex], isPlaying: true };
         });
       },
       toggleLibrary: (track) => {

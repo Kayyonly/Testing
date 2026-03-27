@@ -1,4 +1,4 @@
-import type { Artist, Playlist, Track } from '@/types/music';
+import type { Artist, Playlist } from '@/types/music';
 
 export const communityPlaylists: Playlist[] = [
   {
@@ -20,20 +20,7 @@ export const communityPlaylists: Playlist[] = [
 ];
 
 export const featuredArtists: Artist[] = [
-  { id: 'artist-1', name: 'Ari Abdul' },
-  { id: 'artist-2', name: 'NIKI' },
-  { id: 'artist-3', name: 'The 1975' },
-];
-
-export const mockTracks: Track[] = [
-  {
-    id: 'track-1',
-    videoId: 'dQw4w9WgXcQ',
-    title: 'Sample Song One',
-    artist: 'Sample Artist',
-    album: 'Sample Album',
-    thumbnail: 'https://placehold.co/300x300?text=Track+1',
-    duration: '3:41',
-    dateAdded: new Date().toISOString(),
-  },
+  { id: 'UCbW18JZRgko_mOGm5er8Yzg', name: 'Ari Abdul' },
+  { id: 'UCqECaJ8Gagnn7YCbPEzWH6g', name: 'Taylor Swift' },
+  { id: 'UC-9-kyTW8ZkZNDHQJ6FgpwQ', name: 'Various Artists' },
 ];

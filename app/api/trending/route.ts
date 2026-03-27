@@ -1,14 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getYTMusicClient } from '@/lib/ytmusic';
 
-export async function GET(request: NextRequest) {
-  const q = request.nextUrl.searchParams.get('q')?.trim() || 'indonesia';
-
+export async function GET() {
   try {
     const ytmusic = await getYTMusicClient();
-    const results = await ytmusic.searchSongs(q);
 
-    const tracks = results.slice(0, 30).map((item: any) => ({
+    const [indonesia, global] = await Promise.all([
+      ytmusic.searchSongs('Top Indonesia 2026'),
+      ytmusic.searchSongs('Global Top Hits 2026'),
+    ]);
+
+    const tracks = [...indonesia, ...global].slice(0, 30).map((item: any) => ({
       id: item.videoId,
       videoId: item.videoId,
       title: item.name,
@@ -23,7 +25,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       {
-        error: 'Gagal mengambil data dari YouTube Music.',
+        error: 'Gagal mengambil data trending.',
         details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 },

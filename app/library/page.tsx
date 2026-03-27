@@ -1,21 +1,70 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import ArtistItem from '@/components/ArtistItem';
 import CommunityPlaylistCard from '@/components/CommunityPlaylistCard';
 import HorizontalScroll from '@/components/HorizontalScroll';
 import TrackItem from '@/components/TrackItem';
-import { communityPlaylists, featuredArtists, mockTracks } from '@/lib/db';
+import { communityPlaylists, featuredArtists } from '@/lib/db';
 import { useMusicStore } from '@/lib/store';
+import type { Track } from '@/types/music';
 
 export default function LibraryPage() {
   const savedSongs = useMusicStore((state) => state.userLibrary.savedSongs);
-  const tracks = savedSongs.length ? savedSongs : mockTracks;
+  const playTracks = useMusicStore((state) => state.playTracks);
+
+  const [tracks, setTracks] = useState<Track[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadTracks() {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/search?q=indonesia');
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Gagal mengambil lagu.');
+        }
+
+        if (active) {
+          setTracks(data.tracks || []);
+          setError('');
+        }
+      } catch (err) {
+        if (active) {
+          setError(err instanceof Error ? err.message : 'Gagal mengambil lagu.');
+        }
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    loadTracks();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const mergedTracks = savedSongs.length ? [...savedSongs, ...tracks.filter((track) => !savedSongs.find((item) => item.id === track.id))] : tracks;
 
   return (
     <main className="space-y-8">
-      <header>
-        <h1 className="text-3xl font-semibold tracking-tight">Your Library</h1>
-        <p className="text-sm text-apple-gray-500">Modular, clean, and scalable music app architecture.</p>
+      <header className="flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-semibold tracking-tight">Your Library</h1>
+          <p className="text-sm text-apple-gray-500">Lagu Indonesia asli dari ytmusic-api.</p>
+        </div>
+        <button
+          onClick={() => playTracks(mergedTracks)}
+          disabled={!mergedTracks.length}
+          className="rounded-full bg-black px-4 py-2 text-sm text-white disabled:opacity-50 dark:bg-white dark:text-black"
+        >
+          Play All
+        </button>
       </header>
 
       <section className="space-y-3">
@@ -45,8 +94,11 @@ export default function LibraryPage() {
           <p className="text-right">Actions</p>
         </div>
 
+        {loading ? <p className="px-3 text-sm text-apple-gray-500">Loading lagu Indonesia...</p> : null}
+        {error ? <p className="px-3 text-sm text-red-500">{error}</p> : null}
+
         <div className="space-y-1">
-          {tracks.map((track, index) => (
+          {mergedTracks.map((track, index) => (
             <TrackItem key={track.id} track={track} index={index} />
           ))}
         </div>
